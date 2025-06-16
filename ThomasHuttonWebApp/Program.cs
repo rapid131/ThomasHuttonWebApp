@@ -1,12 +1,18 @@
 using ThomasHuttonWebApp.Components;
+using ThomasHuttonWebApp.Components.Classes;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+var connectionString = builder.Configuration.GetConnectionString("AzureSqlDb");
 
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(connectionString));
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

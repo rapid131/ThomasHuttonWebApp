@@ -1,19 +1,42 @@
 ﻿@page "/visitors"
 @rendermode InteractiveServer
+@using ThomasHuttonWebApp.Components;
 
-<PageTitle>Visitor's Center'</PageTitle>
+<PageTitle>Visitor's Center</PageTitle>
 
 <h1>Visitor's Center</h1>
 
 <p class="lead">Please enter your first name and the company you represent. Your data will be sent to a SQL database and displayed below. </p>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<EditForm Model="@newContact" OnValidSubmit="@AddContact">
+    <InputText @bind-Value="newPerson.Name" placeholder="Name" class="form-control mb-2" />
+    <InputText @bind-Value="newPerson.Company" placeholder="Company" class="form-control mb-2" />
+    <button type="submit" class="btn btn-primary">Submit</button>
+</EditForm>
+
+<hr />
+<h4>Saved Contacts</h4>
+<ul>
+    @foreach (var contact in contacts)
+    {
+        <li><strong>@contact.Name</strong> — @contact.Company</li>
+    }
+</ul>
 
 @code {
-    private int currentCount = 0;
+    private Person newPerson = new();
+    private List<Person> contacts = new();
 
-    private void IncrementCount()
+    protected override async Task OnInitializedAsync()
     {
-        currentCount++;
+        contacts = await Db.Contacts.ToListAsync();
+    }
+
+    private async Task AddContact()
+    {
+        Db.Contacts.Add(newContact);
+        await Db.SaveChangesAsync();
+        contacts = await Db.Contacts.ToListAsync();
+        newContact = new Contact(); // Reset form
     }
 }

@@ -1,5 +1,6 @@
 using ThomasHuttonWebApp.Components;
 using ThomasHuttonWebApp.Components.Classes;
+using Microsoft.EntityFrameworkCore;
 
 
 var builder = WebApplication.CreateBuilder(args);

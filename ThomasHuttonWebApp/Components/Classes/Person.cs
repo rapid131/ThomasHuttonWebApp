@@ -2,9 +2,9 @@
 {
     public class Person
     {
-        public string company { get; set; }
-        public string name { get; set; }
-        public DateTime datesigned { get; set; }
+        public string Company { get; set; }
+        public string Name { get; set; }
+        public DateTime Datesigned { get; set; }
 
     }
 }

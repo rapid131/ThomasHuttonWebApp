@@ -3,6 +3,7 @@
 @using Classes
 @using Microsoft.EntityFrameworkCore
 @inject AppDbContext Db
+@inject IJSRuntime JS
 
 
 <PageTitle>Visitor's Center</PageTitle>
@@ -45,7 +46,7 @@
                     <tr class="table-hover">
                         <td>@person.Name</td>
                         <td>@person.Company</td>
-                        <td>@person.Datesigned</td>
+                        <td>@person.Datesigned.ToString("MM/dd/yyyy")</td>
                     </tr>
                 }
             </tbody>
@@ -86,7 +87,7 @@
 
     private async Task AddContact()
     {
-        newPerson.Datesigned = DateTime.Now;
+        newPerson.Datesigned = DateTime.UtcNow;
         Db.Contacts.Add(newPerson);
         await Db.SaveChangesAsync();
         contacts = await Db.Contacts.ToListAsync();

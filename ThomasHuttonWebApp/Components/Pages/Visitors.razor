@@ -8,31 +8,42 @@
 <PageTitle>Visitor's Center</PageTitle>
 
 <h1>Visitor's Center</h1>
+@if (isLoading)
+{
+    <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+}
+else
+{
+    <p class="lead">Please enter your first name and the company you represent. Your data will be sent to a SQL database and displayed below. </p>
 
-<p class="lead">Please enter your first name and the company you represent. Your data will be sent to a SQL database and displayed below. </p>
+    <EditForm Model="@newPerson" OnValidSubmit="@AddContact">
+        <InputText @bind-Value="newPerson.Name" placeholder="Name" class="form-control mb-2" />
+        <InputText @bind-Value="newPerson.Company" placeholder="Company" class="form-control mb-2" />
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </EditForm>
 
-<EditForm Model="@newPerson" OnValidSubmit="@AddContact">
-    <InputText @bind-Value="newPerson.Name" placeholder="Name" class="form-control mb-2" />
-    <InputText @bind-Value="newPerson.Company" placeholder="Company" class="form-control mb-2" />
-    <button type="submit" class="btn btn-primary">Submit</button>
-</EditForm>
-
-<hr />
-<h4>Saved Contacts</h4>
-<ul>
-    @foreach (var person in contacts)
-    {
-        <li><strong>@person.Name</strong> — @person.Company</li>
-    }
-</ul>
+    <hr />
+    <h4>Saved Contacts</h4>
+    <ul>
+        @foreach (var person in contacts)
+        {
+            <li><strong>@person.Name</strong> — @person.Company</li>
+        }
+    </ul>
+}
 
 @code {
     private Person newPerson = new();
     private List<Person> contacts = new();
+    private bool isLoading;
 
     protected override async Task OnInitializedAsync()
     {
+        isLoading = true;
         contacts = await Db.Contacts.ToListAsync();
+        isLoading = false;
     }
 
     private async Task AddContact()

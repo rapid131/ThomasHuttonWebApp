@@ -12,7 +12,9 @@
 <p class="lead">Please enter your first name and the company you represent. Your data will be sent to a SQL database and displayed below. </p>
 
 <EditForm Model="@newPerson" OnValidSubmit="@AddContact">
-    <InputText @bind-Value="newPerson.Name" placeholder="Name" class="form-control mb-2" />
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <InputText @bind-Value="newPerson.Name" placeholder="First Name" class="form-control mb-2" />
     <InputText @bind-Value="newPerson.Company" placeholder="Company" class="form-control mb-2" />
     <button type="submit" class="btn btn-primary">Submit</button>
 </EditForm>
@@ -28,7 +30,7 @@
 else
 {
     <table class= "table table-sm">
-        <thead>
+        <thead class="table-dark">
             <tr>
                 <th scope="col">Name</th>
                 <th scope="col">Company</th>
@@ -38,7 +40,7 @@ else
         <tbody>
             @foreach(var person in contacts)
             {
-                <tr>
+                <tr class="table-hover">
                     <td>@person.Name</td>
                     <td>@person.Company</td>
                     <td>@person.Datesigned</td>

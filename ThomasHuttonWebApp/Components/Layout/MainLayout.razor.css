@@ -9,7 +9,7 @@ main {
 }
 
 .sidebar {
-    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+    background-image: linear-gradient(180deg, rgb(58, 255, 160, 0.82) 0%, rgb(153, 255, 206, 0.82) 70%);
 }
 
 .top-row {

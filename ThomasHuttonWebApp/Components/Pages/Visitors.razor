@@ -39,11 +39,16 @@ else
     private List<Person> contacts = new();
     private bool isLoading;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        isLoading = true;
-        contacts = await Db.Contacts.ToListAsync();
-        isLoading = false;
+        if (firstRender)
+        {
+            isLoading = true;
+            StateHasChanged();
+            contacts = await Db.Contacts.ToListAsync();
+            isLoading = false;
+            StateHasChanged(); // trigger re-render after load
+        }
     }
 
     private async Task AddContact()

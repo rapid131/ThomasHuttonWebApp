@@ -7,9 +7,12 @@
     </div>
 
     <main>
-        <div class="loading-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.7); z-index: 9999; display: flex; align-items: center; justify-content: center;">
-            <div class="spinner-border text-primary" role="status"></div>
-        </div>
+        @if (isRefreshing)
+        {
+            <div class="loading-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.7); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+                <div class="spinner-border text-primary" role="status"></div>
+            </div>
+        }
         <div class="top-row px-4">
             <a href="https://www.linkedin.com/in/thomas-hutton-b85327308/" target="_blank">LinkedIn</a>
         </div>
@@ -32,11 +35,11 @@
     {
         NavManager.LocationChanged += (_, __) =>
         {
-            isNavigating = true;
+            isRefreshing = true;
             StateHasChanged();
             _ = Task.Delay(500).ContinueWith(_ =>
             {
-                isNavigating = false;
+                isRefreshing = false;
                 InvokeAsync(StateHasChanged);
             });
         };

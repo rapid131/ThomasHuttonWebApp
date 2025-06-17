@@ -21,40 +21,57 @@
 
 <hr />
 <h4>Saved Contacts</h4>
-@if (isLoading)
-{
-    <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-    </div>
-}
-else
-{
-    <table class= "table table-sm">
-        <thead class="table-dark">
-            <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Company</th>
-                <th scope="col">Date Signed</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach(var person in contacts)
-            {
-                <tr class="table-hover">
-                    <td>@person.Name</td>
-                    <td>@person.Company</td>
-                    <td>@person.Datesigned</td>
+<ErrorBoundary>
+    <ChildContent>
+    @if (isLoading)
+    {
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    }
+    else
+    {
+        <table class= "table table-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Company</th>
+                    <th scope="col">Date Signed</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-}
+            </thead>
+            <tbody>
+                @foreach(var person in contacts)
+                {
+                    <tr class="table-hover">
+                        <td>@person.Name</td>
+                        <td>@person.Company</td>
+                        <td>@person.Datesigned</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    </ChildContent>
+    <ErrorContent>
+        <div class="alert alert-danger" role="alert">
+            <h5>Something went wrong.</h5>
+            <p>Please try reloading the page.</p>
+            <button class="btn btn-danger" @onclick="ReloadPage">Reload</button>
+        </div>
+    </ErrorContent>
+
+</ErrorBoundary>
 
 @code {
     private Person newPerson = new();
     private List<Person> contacts = new();
     private bool isLoading;
+    void ReloadPage()
+    {
+        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+    }
 
+    [Inject] NavigationManager NavigationManager { get; set; }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)

@@ -1,0 +1,58 @@
+﻿@page "/apishowcase"
+@inject HttpClient Http
+@using Classes
+@rendermode InteractiveServer
+
+<h1>API Showcase</h1>
+
+<div class="row d-flex align-items-stretch">
+    <div class="col-sm-6 mb-3 mb-sm-0">
+        <div class="card h-100 text-center border-dark">
+            <h3 class="card-header">Weather API</h3>
+            <div class="card-body">
+                <input @bind="city" placeholder="Enter city" class="form-control mb-3" />
+                <button class="btn btn-primary mb-3" @onclick="WeatherUpdate">Check Forecast</button>
+                @if (!string.IsNullOrEmpty(error))
+                {
+                    <div class="alert alert-danger">@error</div>
+                }
+                else if (forecast != null)
+                {
+                    <h5 class="card-header">@forecast.location.name, @forecast.location.region @forecast.location.country</h5>
+                    <p class="card-text">
+                        <strong>Temperature:</strong> @forecast.current.temp_f °F
+                        <br />
+                        <strong>Conditions:</strong> @forecast.current.condition.text
+                        <img src="https:@forecast.current.condition.icon" />
+                    </p>
+                }
+                else
+                {
+                    <p class="card-text text-muted">Enter a city and click "Check Forecast".</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string city = "Chicago";
+    private Forecast forecast;
+    private string error;
+
+    private async Task WeatherUpdate()
+    {
+        error = null;
+        try
+        {
+            var url = $"https://api.weatherapi.com/v1/current.json?key=bde39218717c435386a12830251806&q={city}";
+            forecast = await Http.GetFromJsonAsync<Forecast>(url);
+        }
+        catch (HttpRequestException ex)
+        {
+            error = "Location not found";
+            Console.WriteLine("Weather API error: " + ex.Message);
+        }
+    }
+}
+

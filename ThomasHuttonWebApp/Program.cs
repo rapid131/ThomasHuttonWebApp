@@ -12,6 +12,8 @@ var connectionString = builder.Configuration.GetConnectionString("AzureSqlDb");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
+builder.Services.AddScoped(sp => new HttpClient {BaseAddress = new Uri("https://api.weatherapi.com/")});
+
 var app = builder.Build();
 
 

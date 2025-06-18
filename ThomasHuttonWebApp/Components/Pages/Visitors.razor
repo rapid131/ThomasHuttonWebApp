@@ -3,7 +3,7 @@
 @using Classes
 @using Microsoft.EntityFrameworkCore
 @inject AppDbContext Db
-@inject IJSRuntime JS
+
 
 
 <PageTitle>Visitor's Center</PageTitle>
@@ -22,51 +22,49 @@
 
 <hr />
 <h4>Saved Contacts</h4>
-<ErrorBoundary>
-    <ChildContent>
-    @if (isLoading)
-    {
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-    }
-    else
-    {
-        <table class= "table table-sm">
-            <thead class="table-dark">
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Company</th>
-                    <th scope="col">Date Signed</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach(var person in contacts)
-                {
-                    <tr class="table-hover">
-                        <td>@person.Name</td>
-                        <td>@person.Company</td>
-                        <td>@person.Datesigned.ToString("MM/dd/yyyy")</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-    </ChildContent>
-    <ErrorContent>
-        <div class="alert alert-danger" role="alert">
-            <h5>Something went wrong.</h5>
-            <p>Please try reloading the page.</p>
-            <button class="btn btn-danger" @onclick="ReloadPage">Reload</button>
-        </div>
-    </ErrorContent>
 
-</ErrorBoundary>
+@if (isLoading)
+{
+<div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+    </div>
+}
+else if(!string.IsNullOrEmpty(error))
+{
+    <div class="alert alert-danger" role="alert">
+        <h3>SQL database booting up from sleep state, please reload page</h3>
+        <button class="btn btn-danger" @onclick="ReloadPage">Reload</button>
+    </div>
+}
+else
+{
+<table class= "table table-sm">
+    <thead class="table-dark">
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Company</th>
+            <th scope="col">Date Signed</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var person in contacts)
+        {
+            <tr class="table-hover">
+                <td>@person.Name</td>
+                <td>@person.Company</td>
+                <td>@person.Datesigned.ToString("MM/dd/yyyy")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+}
+
 
 @code {
     private Person newPerson = new();
     private List<Person> contacts = new();
     private bool isLoading;
+    private string error;
     void ReloadPage()
     {
         NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
@@ -75,14 +73,26 @@
     [Inject] NavigationManager NavigationManager { get; set; }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        error = null;
+        if (!firstRender) return;
+
+        isLoading = true;
+        StateHasChanged();             
+
+        try
         {
-            isLoading = true;
-            StateHasChanged();
             contacts = await Db.Contacts.ToListAsync();
-            isLoading = false;
-            StateHasChanged(); // trigger re-render after load
         }
+        catch (Exception ex)
+        {
+            error = ex.Message;          
+        }
+        finally
+        {
+            isLoading = false;            
+            await InvokeAsync(StateHasChanged);
+        }
+
     }
 
     private async Task AddContact()
@@ -91,6 +101,6 @@
         Db.Contacts.Add(newPerson);
         await Db.SaveChangesAsync();
         contacts = await Db.Contacts.ToListAsync();
-        newPerson = new Person(); // Reset form
+        newPerson = new Person(); 
     }
 }

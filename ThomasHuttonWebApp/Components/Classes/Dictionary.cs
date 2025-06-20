@@ -13,6 +13,7 @@
         public class Meaning
         {
             public List<Definition> definitions { get; set; }
+            public string partOfSpeech {  get; set; }
         }
         public class Definition
         {

@@ -38,7 +38,7 @@
             <h3 class="card-header">Dictionary API</h3>
             <div class="card-body">
                 <input @bind="word" placeholder="Enter Word" class="form-control mb-3" />
-                <button class="btn btn-primary mb-3" @onclick="DictionarySearch">Check Forecast</button>
+                <button class="btn btn-primary mb-3" @onclick="DictionarySearch">Look Up Word</button>
                 @if (!string.IsNullOrEmpty(dictionaryError))
                 {
                     <div class="alert alert-danger">@dictionaryError</div>
@@ -46,7 +46,17 @@
                 {
                     <h5 class="card-header">@entry.word</h5>
                     <br />
+                    <strong>Part of Speech: </strong> @entry.meanings[currentMeaningIndex].partOfSpeech
+                    <br />
+                    <strong>Definition: </strong> @entry.meanings[currentMeaningIndex].definitions[currentDefIndex].definition
+                    <br />
+                    <br />
+                    <button class="btn btn-outline-secondary mb-3" @onclick="NextDefinition">Next Definition</button>
 
+                }
+                else
+                {
+                    <p class="card-text text-muted">Enter a word and click "Look Up Word".</p>
                 }
             </div>
         </div>
@@ -74,9 +84,12 @@
     private Dictionary entry;
     private string word = "Hello";
     private string dictionaryError;
+    private int currentDefIndex = 0;
+    private int currentMeaningIndex = 0;
     private async Task DictionarySearch()
     {
         dictionaryError = null;
+        currentDefIndex = 0;
         try
         {
             var url = $"https://api.dictionaryapi.dev/api/v2/entries/en/{word}";
@@ -87,7 +100,21 @@
         catch(HttpRequestException ex)
         {
             dictionaryError = "Word not found";
-            Console.WriteLine("Dictionary API errro" + ex.Message);
+            Console.WriteLine("Dictionary API error" + ex.Message);
+        }
+    }
+
+    private void NextDefinition()
+    {
+        currentDefIndex++;
+        if (currentDefIndex >= entry.meanings[0].definitions.Count)
+        {
+            currentDefIndex = 0;
+            currentMeaningIndex++;
+            if(currentMeaningIndex >= entry.meanings.Count)
+            {
+                currentMeaningIndex = 0;
+            }
         }
     }
 }

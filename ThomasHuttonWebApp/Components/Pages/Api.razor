@@ -12,9 +12,9 @@
             <div class="card-body">
                 <input @bind="city" placeholder="Enter city" class="form-control mb-3" />
                 <button class="btn btn-primary mb-3" @onclick="WeatherUpdate">Check Forecast</button>
-                @if (!string.IsNullOrEmpty(error))
+                @if (!string.IsNullOrEmpty(weathererror))
                 {
-                    <div class="alert alert-danger">@error</div>
+                    <div class="alert alert-danger">@weathererror</div>
                 }
                 else if (forecast != null)
                 {
@@ -33,16 +33,33 @@
             </div>
         </div>
     </div>
+    <div class="col-sm-6">
+        <div class="card h-100 text-center border-dark">
+            <h3 class="card-header">Dictionary API</h3>
+            <div class="card-body">
+                <input @bind="word" placeholder="Enter Word" class="form-control mb-3" />
+                <button class="btn btn-primary mb-3" @onclick="DictionarySearch">Check Forecast</button>
+                @if (!string.IsNullOrEmpty(dictionaryError))
+                {
+                    <div class="alert alert-danger">@dictionaryError</div>
+                }else if (entry != null)
+                {
+                    <h5 class="card-header">@entry.word</h5>
+                    <br />
+
+                }
+            </div>
+        </div>
+    </div>
 </div>
 
 @code {
     private string city = "Chicago";
     private Forecast forecast;
-    private string error;
-
+    private string weathererror;
     private async Task WeatherUpdate()
     {
-        error = null;
+        weathererror = null;
         try
         {
             var url = $"https://api.weatherapi.com/v1/current.json?key=bde39218717c435386a12830251806&q={city}";
@@ -50,8 +67,27 @@
         }
         catch (HttpRequestException ex)
         {
-            error = "Location not found";
+            weathererror = "Location not found";
             Console.WriteLine("Weather API error: " + ex.Message);
+        }
+    }
+    private Dictionary entry;
+    private string word = "Hello";
+    private string dictionaryError;
+    private async Task DictionarySearch()
+    {
+        dictionaryError = null;
+        try
+        {
+            var url = $"https://api.dictionaryapi.dev/api/v2/entries/en/{word}";
+            var dictionaryList = await Http.GetFromJsonAsync<List<Dictionary>>(url);
+            entry = dictionaryList[0];
+
+        }
+        catch(HttpRequestException ex)
+        {
+            dictionaryError = "Word not found";
+            Console.WriteLine("Dictionary API errro" + ex.Message);
         }
     }
 }

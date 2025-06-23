@@ -107,7 +107,7 @@
     private void NextDefinition()
     {
         currentDefIndex++;
-        if (currentDefIndex >= entry.meanings[0].definitions.Count)
+        if (currentDefIndex >= entry.meanings[currentMeaningIndex].definitions.Count)
         {
             currentDefIndex = 0;
             currentMeaningIndex++;
